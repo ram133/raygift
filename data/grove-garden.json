@@ -1,25 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:37:52.543Z",
+  "updatedAt": "2026-11-20T04:37:53.969Z",
   "gardeners": {
     "g_t2db56": {
       "id": "g_t2db56",
       "nickname": "Solar Acorn #16",
       "joinedAt": "2026-11-20T04:37:52.543Z",
-      "updatedAt": "2026-11-20T04:37:52.543Z",
+      "updatedAt": "2026-11-20T04:37:53.969Z",
       "waters": 5,
       "harvestCount": 0,
-      "xp": 0,
+      "xp": 5,
       "items": [],
       "plots": [
         {
           "slot": 0,
-          "seed": null,
-          "plantedAt": null,
+          "seed": "sprout",
+          "plantedAt": "2026-11-20T04:37:53.969Z",
           "waterCount": 0,
           "lastWateredAt": null,
-          "readyAt": null,
-          "state": "empty"
+          "readyAt": "2026-11-20T04:38:05.969Z",
+          "state": "growing"
         },
         {
           "slot": 1,
