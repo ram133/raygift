@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:17:42.016Z",
+  "updatedAt": "2026-11-20T04:17:44.115Z",
   "games": {
     "T359GB": {
       "code": "T359GB",
@@ -85,7 +85,7 @@
     },
     "PEH8MZ": {
       "code": "PEH8MZ",
-      "status": "waiting",
+      "status": "active",
       "board": [
         [
           0,
@@ -147,13 +147,16 @@
           "name": "RAYJOR",
           "joinedAt": "2026-11-20T04:17:42.016Z"
         },
-        "2": null
+        "2": {
+          "name": "RIVAL_2",
+          "joinedAt": "2026-11-20T04:17:44.115Z"
+        }
       },
       "turn": 1,
       "winner": null,
       "isDraw": false,
       "lastMove": null,
-      "updatedAt": "2026-11-20T04:17:42.016Z"
+      "updatedAt": "2026-11-20T04:17:44.115Z"
     }
   }
 }
