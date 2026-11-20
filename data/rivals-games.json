@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:15:49.873Z",
+  "updatedAt": "2026-11-20T04:15:53.690Z",
   "games": {
     "T359GB": {
       "code": "T359GB",
@@ -52,7 +52,7 @@
           0
         ],
         [
-          0,
+          1,
           0,
           0,
           0,
@@ -71,11 +71,17 @@
           "joinedAt": "2026-11-20T04:15:49.873Z"
         }
       },
-      "turn": 1,
+      "turn": 2,
       "winner": null,
       "isDraw": false,
-      "lastMove": null,
-      "updatedAt": "2026-11-20T04:15:49.873Z"
+      "lastMove": {
+        "player": 1,
+        "row": 5,
+        "col": 0,
+        "moveId": "dup-check-1",
+        "at": "2026-11-20T04:15:53.690Z"
+      },
+      "updatedAt": "2026-11-20T04:15:53.690Z"
     }
   }
 }
