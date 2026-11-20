@@ -1,6 +1,21 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:51:00Z",
-  "holders": {},
+  "updatedAt": "2026-11-20T11:39:12.583Z",
+  "holders": {
+    "v_o882kh": {
+      "id": "v_o882kh",
+      "nickname": "Cobalt Relic #99",
+      "joinedAt": "2026-11-20T11:39:12.583Z",
+      "updatedAt": "2026-11-20T11:39:12.583Z",
+      "lastDropAt": null,
+      "dropCount": 0,
+      "xp": 0,
+      "shards": 2,
+      "upgrades": [],
+      "inventory": {},
+      "rewards": [],
+      "lastDrop": null
+    }
+  },
   "claimedRewards": {}
 }
