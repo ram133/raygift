@@ -1,0 +1,12 @@
+name = "raygift-table"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (set with wrangler secret put):
+#   GITHUB_TOKEN
+# Optional vars can also be set as secrets or in [vars]
+# [vars]
+# GITHUB_OWNER = "ram133"
+# GITHUB_REPO = "raygift"
+# LEADERBOARD_PATH = "table/leaderboard.json"
+# ALLOWED_ORIGIN = "*"
