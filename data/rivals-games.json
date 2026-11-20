@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:15:47.668Z",
+  "updatedAt": "2026-11-20T04:15:49.873Z",
   "games": {
     "T359GB": {
       "code": "T359GB",
-      "status": "waiting",
+      "status": "active",
       "board": [
         [
           0,
@@ -66,13 +66,16 @@
           "name": "P1_TEST",
           "joinedAt": "2026-11-20T04:15:47.668Z"
         },
-        "2": null
+        "2": {
+          "name": "P2_TEST",
+          "joinedAt": "2026-11-20T04:15:49.873Z"
+        }
       },
       "turn": 1,
       "winner": null,
       "isDraw": false,
       "lastMove": null,
-      "updatedAt": "2026-11-20T04:15:47.668Z"
+      "updatedAt": "2026-11-20T04:15:49.873Z"
     }
   }
 }
