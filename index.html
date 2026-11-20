@@ -169,21 +169,13 @@ footer {
     <p>Mobile entry point for RayGift tools</p>
   </header>
 
-  <section class="card" id="vault">
-    <h2>RayGift Vault </h2>
-    <p class="desc">. Counter is not live or synced.</p>
-    
-      <strong id="pts">0</strong>
-    
-    <div class="btn-row" style="margin-top:0.85rem">
-      <a class="btn" href="./vault/">Play Vault</a>
-    </div>
-  </div>
-    <div class="btn-row">
-      <button type="button" id="add">+10</button>
-      
-    </div>
-  </section>
+  <section id="vault" class="card">
+        <h2>RayGift Vault</h2>
+        <p>Free daily drops and a shared collection with upgrades and one-time reward codes.</p>
+        <div class="btn-row">
+          <a class="btn" href="./vault/">Open RayGift Vault</a>
+        </div>
+      </section>
 
   <section class="card">
     <h2>Table</h2>
@@ -230,29 +222,6 @@ footer {
   <footer>RayGift Hub</footer>
 </div>
 
-<script>
-(() => {
-  const KEY = 'raygift_vault_pts';
-  const ptsEl = document.getElementById('pts');
-  let pts = parseInt(localStorage.getItem(KEY) || '0', 10) || 0;
 
-  const render = () => {
-    ptsEl.textContent = pts.toLocaleString();
-    localStorage.setItem(KEY, String(pts));
-  };
-
-  document.getElementById('add').addEventListener('click', () => {
-    pts += 10;
-    render();
-  });
-
-  document.getElementById('reset').addEventListener('click', () => {
-    pts = 0;
-    render();
-  });
-
-  render();
-})();
-</script>
 </body>
 </html>
