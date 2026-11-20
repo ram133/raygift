@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RayGift Table — Quick Tap</title>
+<style>
+:root {
+  --bg: #0f0f12;
+  --surface: #1a1a20;
+  --border: #2a2a34;
+  --text: #e8e6e3;
+  --muted: #9a9690;
+  --accent: #e2a23a;
+  --accent-dim: #b07d2a;
+  --good: #7d9a62;
+  --danger: #d45b45;
+  --radius: 12px;
+  --pad: 1rem;
+  --max: 28rem;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: var(--pad);
+}
+header {
+  text-align: center;
+  padding: 1.25rem 0 1rem;
+}
+header h1 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+header p {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.back:active { color: var(--text); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+/* Game area */
+.game-area {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+.timer {
+  font-size: 2.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.timer.warn { color: var(--danger); }
+.score-display {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+.score-display strong {
+  color: var(--text);
+  font-size: 1.35rem;
+}
+.tap-btn {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #111;
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.05s, background 0.1s;
+  touch-action: manipulation;
+}
+.tap-btn:active { transform: scale(0.94); background: var(--accent-dim); }
+.tap-btn:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+}
+.tap-btn.ready { background: var(--good); }
+.status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-height: 1.3em;
+}
+
+/* Submit form */
+.submit-form {
+  display: none;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.submit-form.visible { display: flex; flex-direction: column; }
+.submit-form input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+}
+.submit-form input:focus { border-color: var(--accent); }
+.submit-form button {
+  min-height: 2.7rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #111;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.submit-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+.msg {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.msg.ok { color: var(--good); }
+.msg.err { color: var(--danger); }
+
+/* Leaderboard */
+.lb-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lb-title span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  padding: 0.45rem 0.35rem;
+  text-align: left;
+}
+th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border);
+}
+td { border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+.rank { width: 2rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.score-col { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); }
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 1.2rem 0;
+  font-size: 0.9rem;
+}
+
+footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-bottom: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← RayGift Hub</a>
+  <header>
+    <h1>RayGift Table</h1>
+    <p>Quick Tap · 15 seconds · Top 10</p>
+  </header>
+
+  <section class="card">
+    <div class="game-area">
+      <div class="timer" id="timer">15.0</div>
+      <div class="score-display">Taps: <strong id="score">0</strong></div>
+      <button type="button" class="tap-btn ready" id="tapBtn">START</button>
+      <div class="status" id="status">Tap START, then tap as fast as you can</div>
+
+      <div class="submit-form" id="submitForm">
+        <input type="text" id="nameInput" placeholder="Your name (2–16 chars)" maxlength="16" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button type="button" id="submitBtn">Submit score</button>
+        <div class="msg" id="msg"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="lb-title">
+      Leaderboard
+      <span id="lbUpdated">—</span>
+    </div>
+    <div id="lbBody">
+      <div class="empty">Loading…</div>
+    </div>
+  </section>
+
+  <footer>RayGift Table · Draft</footer>
+</div>
+
+<script>
+(() => {
+  // === Config ===
+  // In production the Worker URL will be set here.
+  // For local testing we fall back to a mock that only updates the in-memory view.
+  const WORKER_URL = window.RAYGIFT_WORKER_URL || null; // e.g. "https://raygift-table.yourname.workers.dev"
+  const LEADERBOARD_URL = "./leaderboard.json";
+  const GAME_SECONDS = 15;
+  const MAX_NAME = 16;
+  const MIN_NAME = 2;
+
+  // === DOM ===
+  const timerEl   = document.getElementById("timer");
+  const scoreEl   = document.getElementById("score");
+  const tapBtn    = document.getElementById("tapBtn");
+  const statusEl  = document.getElementById("status");
+  const formEl    = document.getElementById("submitForm");
+  const nameInput = document.getElementById("nameInput");
+  const submitBtn = document.getElementById("submitBtn");
+  const msgEl     = document.getElementById("msg");
+  const lbBody    = document.getElementById("lbBody");
+  const lbUpdated = document.getElementById("lbUpdated");
+
+  // === Game state ===
+  let taps = 0;
+  let running = false;
+  let startTs = 0;
+  let rafId = null;
+  let finalScore = 0;
+
+  function formatTime(sec) {
+    return sec.toFixed(1);
+  }
+
+  function resetGame() {
+    taps = 0;
+    running = false;
+    finalScore = 0;
+    if (rafId) cancelAnimationFrame(rafId);
+    timerEl.textContent = formatTime(GAME_SECONDS);
+    timerEl.classList.remove("warn");
+    scoreEl.textContent = "0";
+    tapBtn.textContent = "START";
+    tapBtn.disabled = false;
+    tapBtn.classList.add("ready");
+    statusEl.textContent = "Tap START, then tap as fast as you can";
+    formEl.classList.remove("visible");
+    msgEl.textContent = "";
+    msgEl.className = "msg";
+  }
+
+  function startGame() {
+    taps = 0;
+    running = true;
+    startTs = performance.now();
+    finalScore = 0;
+    scoreEl.textContent = "0";
+    tapBtn.textContent = "TAP!";
+    tapBtn.classList.remove("ready");
+    statusEl.textContent = "GO!";
+    formEl.classList.remove("visible");
+    tick();
+  }
+
+  function tick() {
+    if (!running) return;
+    const elapsed = (performance.now() - startTs) / 1000;
+    const left = Math.max(0, GAME_SECONDS - elapsed);
+    timerEl.textContent = formatTime(left);
+    if (left <= 3) timerEl.classList.add("warn");
+    else timerEl.classList.remove("warn");
+
+    if (left <= 0) {
+      endGame();
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function endGame() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    finalScore = taps;
+    timerEl.textContent = "0.0";
+    timerEl.classList.add("warn");
+    tapBtn.textContent = "DONE";
+    tapBtn.disabled = true;
+    statusEl.textContent = `Time's up! Score: ${finalScore}`;
+    formEl.classList.add("visible");
+    nameInput.focus();
+  }
+
+  // Pointer / touch friendly: use pointerdown so mobile is responsive
+  tapBtn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    if (tapBtn.disabled) return;
+    if (!running) {
+      startGame();
+      return;
+    }
+    taps += 1;
+    scoreEl.textContent = String(taps);
+  });
+
+  // Also allow keyboard for accessibility / desktop testing
+  document.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.key === " ") {
+      e.preventDefault();
+      if (!running && !tapBtn.disabled) startGame();
+      else if (running) {
+        taps += 1;
+        scoreEl.textContent = String(taps);
+      }
+    }
+  });
+
+  // === Leaderboard ===
+  function renderLeaderboard(data) {
+    const entries = (data && data.entries) || [];
+    if (data && data.updated) {
+      try {
+        const d = new Date(data.updated);
+        lbUpdated.textContent = d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      } catch {
+        lbUpdated.textContent = data.updated;
+      }
+    } else {
+      lbUpdated.textContent = "—";
+    }
+
+    if (!entries.length) {
+      lbBody.innerHTML = '<div class="empty">No scores yet — be the first!</div>';
+      return;
+    }
+
+    let html = "<table><thead><tr><th class=\"rank\">#</th><th>Name</th><th class=\"score-col\">Score</th></tr></thead><tbody>";
+    entries.forEach((e, i) => {
+      const name = (e.name || "—").slice(0, MAX_NAME);
+      const score = Number(e.score) || 0;
+      html += `<tr><td class="rank">${i + 1}</td><td>${escapeHtml(name)}</td><td class="score-col">${score}</td></tr>`;
+    });
+    html += "</tbody></table>";
+    lbBody.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, """);
+  }
+
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch(LEADERBOARD_URL + "?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      renderLeaderboard(data);
+    } catch (err) {
+      lbBody.innerHTML = '<div class="empty">Could not load leaderboard</div>';
+      console.warn("Leaderboard load failed", err);
+    }
+  }
+
+  // === Submit ===
+  submitBtn.addEventListener("click", async () => {
+    const raw = (nameInput.value || "").trim();
+    const name = raw.replace(/\s+/g, " ").slice(0, MAX_NAME);
+    if (name.length < MIN_NAME) {
+      msgEl.textContent = `Name must be at least ${MIN_NAME} characters`;
+      msgEl.className = "msg err";
+      return;
+    }
+    if (finalScore < 1) {
+      msgEl.textContent = "Score too low";
+      msgEl.className = "msg err";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    msgEl.textContent = "Submitting…";
+    msgEl.className = "msg";
+
+    const payload = { name, score: finalScore };
+
+    try {
+      if (WORKER_URL) {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(body.error || ("HTTP " + res.status));
+        }
+        msgEl.textContent = body.message || "Score submitted!";
+        msgEl.className = "msg ok";
+        // Refresh board
+        setTimeout(loadLeaderboard, 800);
+      } else {
+        // Local / draft mode — just show success and keep current board
+        msgEl.textContent = "Draft mode: score recorded locally (Worker not configured)";
+        msgEl.className = "msg ok";
+        console.log("[draft] would submit", payload);
+      }
+    } catch (err) {
+      msgEl.textContent = "Submit failed: " + (err.message || "unknown");
+      msgEl.className = "msg err";
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Allow Enter to submit
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitBtn.click();
+  });
+
+  // Init
+  resetGame();
+  loadLeaderboard();
+
+  // Expose a tiny test hook for local verification
+  window.__raygiftTable = {
+    reset: resetGame,
+    getState: () => ({ taps, running, finalScore }),
+    simulateScore: (n) => { finalScore = n; taps = n; scoreEl.textContent = String(n); formEl.classList.add("visible"); }
+  };
+})();
+</script>
+</body>
+</html>
