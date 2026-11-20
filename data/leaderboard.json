@@ -1,5 +1,11 @@
 {
   "game": "quick-tap",
-  "updatedAt": "2026-11-20T04:04:00Z",
-  "scores": []
+  "updatedAt": "2026-11-20T04:07:01.118Z",
+  "scores": [
+    {
+      "name": "RAYJOR",
+      "score": 42,
+      "at": "2026-11-20T04:07:01.118Z"
+    }
+  ]
 }
