@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:37:56.350Z",
+  "updatedAt": "2026-11-20T04:38:57.760Z",
   "gardeners": {
     "g_t2db56": {
       "id": "g_t2db56",
@@ -20,6 +20,72 @@
           "lastWateredAt": "2026-11-20T04:37:56.350Z",
           "readyAt": "2026-11-20T04:38:02.603Z",
           "state": "growing"
+        },
+        {
+          "slot": 1,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
+        },
+        {
+          "slot": 2,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
+        },
+        {
+          "slot": 3,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
+        },
+        {
+          "slot": 4,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
+        },
+        {
+          "slot": 5,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
+        }
+      ]
+    },
+    "g_oyrlh3": {
+      "id": "g_oyrlh3",
+      "nickname": "Cinder Finch #31",
+      "joinedAt": "2026-11-20T04:38:57.760Z",
+      "updatedAt": "2026-11-20T04:38:57.760Z",
+      "waters": 5,
+      "harvestCount": 0,
+      "xp": 0,
+      "items": [],
+      "plots": [
+        {
+          "slot": 0,
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
         },
         {
           "slot": 1,
