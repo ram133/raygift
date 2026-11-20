@@ -1,25 +1,34 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T04:39:05.862Z",
+  "updatedAt": "2026-11-20T04:39:33.750Z",
   "gardeners": {
     "g_t2db56": {
       "id": "g_t2db56",
       "nickname": "Solar Acorn #16",
       "joinedAt": "2026-11-20T04:37:52.543Z",
-      "updatedAt": "2026-11-20T04:37:56.350Z",
-      "waters": 4,
-      "harvestCount": 0,
-      "xp": 15,
-      "items": [],
+      "updatedAt": "2026-11-20T04:39:33.750Z",
+      "waters": 6,
+      "harvestCount": 1,
+      "xp": 40,
+      "items": [
+        {
+          "id": "sprout_dewdrop_charm",
+          "name": "Dewdrop Charm",
+          "seed": "sprout",
+          "count": 1,
+          "firstEarnedAt": "2026-11-20T04:39:33.750Z",
+          "lastEarnedAt": "2026-11-20T04:39:33.750Z"
+        }
+      ],
       "plots": [
         {
           "slot": 0,
-          "seed": "sprout",
-          "plantedAt": "2026-11-20T04:37:53.969Z",
-          "waterCount": 1,
-          "lastWateredAt": "2026-11-20T04:37:56.350Z",
-          "readyAt": "2026-11-20T04:38:02.603Z",
-          "state": "growing"
+          "seed": null,
+          "plantedAt": null,
+          "waterCount": 0,
+          "lastWateredAt": null,
+          "readyAt": null,
+          "state": "empty"
         },
         {
           "slot": 1,
