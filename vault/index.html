@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RayGift Vault</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #171b26;
+      --card-2: #1f2534;
+      --border: #313a52;
+      --text: #f3f6fc;
+      --muted: #9aa6c2;
+      --accent: #a78bfa;
+      --accent-2: #38bdf8;
+      --gold: #fbbf24;
+      --ok: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .app { max-width: 640px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    h1 { margin: 0 0 4px; font-size: 22px; }
+    h2 { margin: 0 0 8px; font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .stat {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 16px; color: var(--accent); }
+    button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 8px 12px;
+    }
+    button.primary { background: var(--accent); color: #120c26; }
+    button.gold { background: var(--gold); color: #241900; }
+    button.secondary { background: var(--card-2); color: var(--text); border: 1px solid var(--border); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .row-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .odds-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .odd-box {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    input, select {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 10px;
+      font-size: 14px;
+    }
+    .flex-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .status-bar { font-size: 13px; color: var(--ok); min-height: 18px; margin-top: 8px; }
+    code { background: var(--card-2); padding: 2px 6px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a href="../">← Hub</a>
+      <span class="muted" id="holderTag">Anonymous Vault Holder</span>
+      <button id="syncBtn" class="secondary" type="button" style="min-height:32px;padding:4px 10px;">Sync</button>
+    </div>
+
+    <div class="card">
+      <h1>RayGift Vault</h1>
+      <div class="muted">Free daily drops with visible server odds, collectible items, upgrades, and one-time shareable reward codes.</div>
+      <div class="stats">
+        <div class="stat"><strong id="stDrops">0</strong><span class="muted">Drops</span></div>
+        <div class="stat"><strong id="stShards">2</strong><span class="muted">Shards</span></div>
+        <div class="stat"><strong id="stXp">0</strong><span class="muted">XP</span></div>
+        <div class="stat"><strong id="stItems">0</strong><span class="muted">Collected</span></div>
+      </div>
+      <div style="margin-top:10px;">
+        <button id="claimDropBtn" class="primary" type="button" style="width:100%;">Claim Daily Drop</button>
+      </div>
+      <div class="status-bar" id="statusMsg">Connecting to Vault...</div>
+    </div>
+
+    <div class="card">
+      <h2>Visible Drop Odds</h2>
+      <div class="odds-grid" id="oddsGrid"></div>
+    </div>
+
+    <div class="card">
+      <h2>Vault Collection & Shareable Rewards</h2>
+      <div id="inventoryList"></div>
+      <div class="flex-row" style="margin-top:10px;">
+        <select id="shareItemSelect" style="flex:1;"></select>
+        <button id="createRewardBtn" class="gold" type="button">Create 1-Time Code</button>
+      </div>
+      <div id="shareResult" class="muted" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Redeem One-Time Reward Code</h2>
+      <div class="flex-row">
+        <input id="redeemCodeInput" type="text" maxlength="16" placeholder="VLT-XXXXXX" style="flex:1;text-transform:uppercase;" />
+        <button id="redeemBtn" class="primary" type="button">Redeem</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Earned Upgrades</h2>
+      <div id="upgradesList"></div>
+    </div>
+  </div>
+
+  <script>
+    const VAULT_WORKER_URL = "https://raygift-vault-worker.3659745.workers.dev";
+    const STORAGE_KEY = "raygift_vault_anon_id_v1";
+    const ITEM_NAMES = {
+      copper_key: "Copper Key",
+      glass_vial: "Glass Vial",
+      star_sigil: "Star Sigil",
+      crown_prism: "Crown Prism"
+    };
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      try { tg.ready(); tg.expand(); } catch (_) {}
+    }
+
+    let holder = null;
+    let busy = false;
+
+    function esc(s) {
+      return String(s || "").replace(/[<>&"]/g, "");
+    }
+
+    function getSavedId() {
+      try { return localStorage.getItem(STORAGE_KEY) || ""; } catch (_) { return ""; }
+    }
+
+    function saveId(id) {
+      try { if (id) localStorage.setItem(STORAGE_KEY, id); } catch (_) {}
+    }
+
+    function render() {
+      if (!holder) return;
+      saveId(holder.id);
+      document.getElementById("holderTag").textContent = `${esc(holder.nickname)} (${esc(holder.id)})`;
+      document.getElementById("stDrops").textContent = String(holder.dropCount || 0);
+      document.getElementById("stShards").textContent = String(holder.shards || 0);
+      document.getElementById("stXp").textContent = String(holder.xp || 0);
+
+      const inv = holder.inventory || {};
+      const ownedEntries = Object.keys(ITEM_NAMES).map((k) => ({ id: k, name: ITEM_NAMES[k], qty: Number(inv[k] || 0) }));
+      const totalQty = ownedEntries.reduce((s, e) => s + e.qty, 0);
+      document.getElementById("stItems").textContent = String(totalQty);
+
+      const claimBtn = document.getElementById("claimDropBtn");
+      claimBtn.disabled = busy || !holder.canClaimDaily;
+      claimBtn.textContent = holder.canClaimDaily
+        ? "Claim Daily Drop"
+        : `Next Drop Ready: ${esc((holder.nextDropAt || "").slice(0, 19).replace("T", " "))} UTC`;
+
+      const odds = Array.isArray(holder.odds) ? holder.odds : [];
+      document.getElementById("oddsGrid").innerHTML = odds.map((o) =>
+        `<div class="odd-box"><strong>${esc(o.name)}</strong> <span class="muted">(${esc(o.rarity)})</span><div>${Number(o.oddsPct || 0)}% odds</div></div>`
+      ).join("");
+
+      const invEl = document.getElementById("inventoryList");
+      invEl.innerHTML = ownedEntries.map((e) =>
+        `<div class="row-card"><div><strong>${esc(e.name)}</strong></div><div><strong>×${e.qty}</strong></div></div>`
+      ).join("");
+
+      const sel = document.getElementById("shareItemSelect");
+      const sharable = ownedEntries.filter((e) => e.qty > 0);
+      sel.innerHTML = sharable.length
+        ? sharable.map((e) => `<option value="${esc(e.id)}">${esc(e.name)} (×${e.qty})</option>`).join("")
+        : '<option value="">No items available to share</option>';
+      document.getElementById("createRewardBtn").disabled = busy || sharable.length === 0;
+
+      const ownedUpgrades = Array.isArray(holder.upgrades) ? holder.upgrades : [];
+      const catalog = Array.isArray(holder.upgradesCatalog) ? holder.upgradesCatalog : [];
+      document.getElementById("upgradesList").innerHTML = catalog.map((u) => {
+        const has = ownedUpgrades.includes(u.id);
+        const canAfford = !has && Number(holder.shards || 0) >= Number(u.costShards || 0);
+        return `
+          <div class="row-card">
+            <div>
+              <div><strong>${esc(u.name)}</strong> <span class="muted">(${Number(u.costShards || 0)} shards)</span></div>
+              <div class="muted">${esc(u.description)}</div>
+            </div>
+            <button class="primary" data-upgrade="${esc(u.id)}" ${busy || has || !canAfford ? "disabled" : ""}>
+              ${has ? "Unlocked" : "Unlock"}
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function callWorker(path, payload) {
+      busy = true;
+      render();
+      try {
+        const res = await fetch(`${VAULT_WORKER_URL}${path}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ holderId: getSavedId() || undefined, ...payload })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        holder = data.holder;
+        return data;
+      } finally {
+        busy = false;
+        render();
+      }
+    }
+
+    async function initOrSync() {
+      try {
+        document.getElementById("statusMsg").textContent = "Syncing Vault state...";
+        const savedId = getSavedId();
+        if (savedId) {
+          const r = await fetch(`${VAULT_WORKER_URL}/state?id=${encodeURIComponent(savedId)}`, { cache: "no-store" });
+          if (r.ok) {
+            const d = await r.json();
+            if (d.holder) {
+              holder = d.holder;
+              render();
+              document.getElementById("statusMsg").textContent = "Vault synced.";
+              return;
+            }
+          }
+        }
+        await callWorker("/init", {});
+        document.getElementById("statusMsg").textContent = "Started anonymous Vault pass.";
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Sync notice: ${e.message}`;
+      }
+    }
+
+    document.getElementById("claimDropBtn").addEventListener("click", async () => {
+      try {
+        const data = await callWorker("/claim", {});
+        const d = data.drop || {};
+        document.getElementById("statusMsg").textContent = `Dropped ${d.name || "item"} (${d.rarity || ""}) +${d.shardsEarned || 1} shards.`;
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Claim notice: ${e.message}`;
+      }
+    });
+
+    document.getElementById("upgradesList").addEventListener("click", async (ev) => {
+      const btn = ev.target.closest("[data-upgrade]");
+      if (!btn || busy) return;
+      try {
+        await callWorker("/upgrade", { upgradeId: btn.dataset.upgrade });
+        document.getElementById("statusMsg").textContent = "Upgrade unlocked.";
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Upgrade notice: ${e.message}`;
+      }
+    });
+
+    document.getElementById("createRewardBtn").addEventListener("click", async () => {
+      const itemId = document.getElementById("shareItemSelect").value;
+      if (!itemId || busy) return;
+      try {
+        const data = await callWorker("/reward/create", { itemId });
+        const code = data.reward && data.reward.code ? data.reward.code : "";
+        document.getElementById("shareResult").innerHTML = code
+          ? `One-time share code: <code>${esc(code)}</code> (${esc(data.reward.itemName)})`
+          : "";
+        document.getElementById("statusMsg").textContent = `Created one-time reward ${code}.`;
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Share notice: ${e.message}`;
+      }
+    });
+
+    document.getElementById("redeemBtn").addEventListener("click", async () => {
+      const code = document.getElementById("redeemCodeInput").value.trim().toUpperCase();
+      if (!code || busy) return;
+      try {
+        const data = await callWorker("/reward/claim", { code });
+        document.getElementById("redeemCodeInput").value = "";
+        document.getElementById("statusMsg").textContent = `Redeemed ${data.reward?.itemName || code} into collection.`;
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Redeem notice: ${e.message}`;
+      }
+    });
+
+    document.getElementById("syncBtn").addEventListener("click", () => initOrSync());
+
+    initOrSync();
+  </script>
+</body>
+</html>
