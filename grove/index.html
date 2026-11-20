@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RayGift Grove</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0b1510;
+      --card: #13241b;
+      --card-2: #1a3024;
+      --border: #284736;
+      --text: #eef7f1;
+      --muted: #9ab5a5;
+      --accent: #34d399;
+      --accent-2: #38bdf8;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .app { max-width: 640px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    h1 { margin: 0 0 4px; font-size: 22px; }
+    h2 { margin: 0 0 8px; font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .stat {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 16px; color: var(--accent); }
+    .seed-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .seed-btn {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .seed-btn.active {
+      border-color: var(--accent);
+      background: #1c3d2c;
+      color: var(--accent);
+    }
+    .plots {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .plot {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .plot-title { font-weight: 700; font-size: 14px; }
+    .plot-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    button.act {
+      flex: 1;
+      min-height: 40px;
+      border: 0;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 8px 10px;
+    }
+    button.plant { background: var(--accent); color: #052e1e; }
+    button.water { background: var(--accent-2); color: #062538; }
+    button.harvest { background: var(--warn); color: #2b1d00; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .items-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    .status-bar { font-size: 13px; color: var(--accent); min-height: 18px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a href="../">← Hub</a>
+      <span class="muted" id="gardenerTag">Anonymous Gardener</span>
+      <button id="refreshBtn" class="seed-btn" type="button" style="padding:6px 10px;">Sync</button>
+    </div>
+
+    <div class="card">
+      <h1>RayGift Grove</h1>
+      <div class="muted">Plant seeds, water plots, harvest garden items, and track your collection.</div>
+      <div class="stats">
+        <div class="stat"><strong id="stHarvests">0</strong><span class="muted">Harvests</span></div>
+        <div class="stat"><strong id="stXp">0</strong><span class="muted">XP</span></div>
+        <div class="stat"><strong id="stWaters">5</strong><span class="muted">Waters</span></div>
+        <div class="stat"><strong id="stItems">0</strong><span class="muted">Items</span></div>
+      </div>
+      <div class="seed-row" id="seedSelector">
+        <button class="seed-btn active" data-seed="sprout" type="button">Sun Sprout (12s)</button>
+        <button class="seed-btn" data-seed="fern" type="button">Moon Fern (20s)</button>
+        <button class="seed-btn" data-seed="bloom" type="button">Star Bloom (30s)</button>
+      </div>
+      <div class="status-bar" id="statusMsg">Connecting to Grove...</div>
+    </div>
+
+    <div class="card">
+      <h2>Garden Plots</h2>
+      <div class="plots" id="plotsGrid"></div>
+    </div>
+
+    <div class="card">
+      <h2>Garden Collection & Progress</h2>
+      <div class="muted" id="progressText" style="margin-bottom:8px;">0 / 3 unique items collected</div>
+      <div class="items-list" id="itemsBox"><span class="muted">No garden items harvested yet.</span></div>
+    </div>
+  </div>
+
+  <script>
+    const GROVE_WORKER_URL = "https://raygift-grove-worker.3659745.workers.dev";
+    const STORAGE_KEY = "raygift_grove_anon_id_v1";
+    const SEED_LABELS = { sprout: "Sun Sprout", fern: "Moon Fern", bloom: "Star Bloom" };
+    const SEED_ITEMS = { sprout: "Dewdrop Charm", fern: "Lantern Leaf", bloom: "Pollen Crown" };
+
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      try { tg.ready(); tg.expand(); } catch (_) {}
+    }
+
+    let selectedSeed = "sprout";
+    let gardener = null;
+    let busy = false;
+
+    function esc(s) {
+      return String(s || "").replace(/[<>&"]/g, "");
+    }
+
+    function getSavedId() {
+      try { return localStorage.getItem(STORAGE_KEY) || ""; } catch (_) { return ""; }
+    }
+
+    function saveId(id) {
+      try { if (id) localStorage.setItem(STORAGE_KEY, id); } catch (_) {}
+    }
+
+    function remainingSec(plot) {
+      if (!plot || !plot.readyAt) return 0;
+      const ms = Date.parse(plot.readyAt) - Date.now();
+      return Math.max(0, Math.ceil(ms / 1000));
+    }
+
+    function render() {
+      if (!gardener) return;
+      saveId(gardener.id);
+      document.getElementById("gardenerTag").textContent = `${esc(gardener.nickname)} (${esc(gardener.id)})`;
+      document.getElementById("stHarvests").textContent = String(gardener.harvestCount || 0);
+      document.getElementById("stXp").textContent = String(gardener.xp || 0);
+      document.getElementById("stWaters").textContent = String(gardener.waters || 0);
+      const items = Array.isArray(gardener.items) ? gardener.items : [];
+      const totalItemCount = items.reduce((acc, it) => acc + Number(it.count || 1), 0);
+      document.getElementById("stItems").textContent = String(totalItemCount);
+      document.getElementById("progressText").textContent = `${items.length} / 3 unique garden items • ${gardener.harvestCount || 0} total harvests`;
+
+      const itemsBox = document.getElementById("itemsBox");
+      if (!items.length) {
+        itemsBox.innerHTML = '<span class="muted">No garden items harvested yet.</span>';
+      } else {
+        itemsBox.innerHTML = items.map((it) =>
+          `<span class="badge">${esc(it.name)} ×${Number(it.count || 1)}</span>`
+        ).join("");
+      }
+
+      const grid = document.getElementById("plotsGrid");
+      grid.innerHTML = (gardener.plots || []).map((plot) => {
+        const rem = remainingSec(plot);
+        const isEmpty = !plot.seed;
+        const isReady = !isEmpty && rem <= 0;
+        const seedName = SEED_LABELS[plot.seed] || plot.seed || "";
+        const rewardName = SEED_ITEMS[plot.seed] || "Garden Item";
+        const stateLine = isEmpty
+          ? "Empty plot — ready for a seed"
+          : isReady
+            ? `${esc(seedName)} is ready! Reward: ${esc(rewardName)}`
+            : `${esc(seedName)} • ${rem}s left • watered ×${Number(plot.waterCount || 0)}`;
+
+        return `
+          <div class="plot">
+            <div>
+              <div class="plot-title">Plot #${Number(plot.slot) + 1}</div>
+              <div class="muted">${stateLine}</div>
+            </div>
+            <div class="plot-actions">
+              ${isEmpty
+                ? `<button class="act plant" data-action="plant" data-slot="${plot.slot}" ${busy ? "disabled" : ""}>Plant ${esc(SEED_LABELS[selectedSeed])}</button>`
+                : isReady
+                  ? `<button class="act harvest" data-action="harvest" data-slot="${plot.slot}" ${busy ? "disabled" : ""}>Harvest</button>`
+                  : `<button class="act water" data-action="water" data-slot="${plot.slot}" ${(busy || (gardener.waters || 0) <= 0) ? "disabled" : ""}>Water</button>`
+              }
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function callWorker(path, payload) {
+      busy = true;
+      render();
+      try {
+        const res = await fetch(`${GROVE_WORKER_URL}${path}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gardenerId: getSavedId() || undefined, ...payload })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        gardener = data.gardener;
+        return data;
+      } finally {
+        busy = false;
+        render();
+      }
+    }
+
+    async function initOrSync() {
+      try {
+        document.getElementById("statusMsg").textContent = "Syncing garden state...";
+        const savedId = getSavedId();
+        if (savedId) {
+          const r = await fetch(`${GROVE_WORKER_URL}/state?id=${encodeURIComponent(savedId)}`, { cache: "no-store" });
+          if (r.ok) {
+            const d = await r.json();
+            if (d.gardener) {
+              gardener = d.gardener;
+              render();
+              document.getElementById("statusMsg").textContent = "Garden synced.";
+              return;
+            }
+          }
+        }
+        await callWorker("/init", {});
+        document.getElementById("statusMsg").textContent = "Started anonymous garden.";
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Sync notice: ${e.message}`;
+      }
+    }
+
+    document.getElementById("seedSelector").addEventListener("click", (ev) => {
+      const btn = ev.target.closest("[data-seed]");
+      if (!btn) return;
+      selectedSeed = btn.dataset.seed;
+      document.querySelectorAll("[data-seed]").forEach((b) => b.classList.toggle("active", b === btn));
+      render();
+    });
+
+    document.getElementById("plotsGrid").addEventListener("click", async (ev) => {
+      const btn = ev.target.closest("[data-action]");
+      if (!btn || busy) return;
+      const action = btn.dataset.action;
+      const slot = Number(btn.dataset.slot);
+      try {
+        if (action === "plant") {
+          await callWorker("/plant", { slot, seed: selectedSeed });
+          document.getElementById("statusMsg").textContent = `Planted ${SEED_LABELS[selectedSeed]} in Plot #${slot + 1}.`;
+        } else if (action === "water") {
+          await callWorker("/water", { slot });
+          document.getElementById("statusMsg").textContent = `Watered Plot #${slot + 1} to speed up growth.`;
+        } else if (action === "harvest") {
+          await callWorker("/harvest", { slot });
+          document.getElementById("statusMsg").textContent = `Harvested Plot #${slot + 1} and added item to collection.`;
+        }
+      } catch (e) {
+        document.getElementById("statusMsg").textContent = `Action blocked: ${e.message}`;
+        await initOrSync();
+      }
+    });
+
+    document.getElementById("refreshBtn").addEventListener("click", () => initOrSync());
+
+    setInterval(() => {
+      if (gardener && !busy) render();
+    }, 1000);
+
+    initOrSync();
+  </script>
+</body>
+</html>
